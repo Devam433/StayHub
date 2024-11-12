@@ -1,26 +1,11 @@
 import mongoose, { Mongoose } from "mongoose";
 
 const staySchema = new mongoose.Schema({
-    //id of the landlord
     createdBy: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Users",
         uinque: true,
         required: true
-    },
-    ownerInfo: {
-        name: {
-            type: String,
-            required: true
-        },
-        contact: {
-            phoneNo: {
-                type: Number,
-            },
-            email: {
-                type: String,
-                lowercase: true
-            }
-        },
     },
     stayDetails: {
         address: {
