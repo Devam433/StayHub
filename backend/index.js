@@ -2,6 +2,7 @@ import express from 'express'
 import { connectDB } from './db/config.js'
 import { configDotenv } from 'dotenv';
 import stayRouter from './routes/stayRoute.js'
+import userRouter from './routes/usersRoute.js'
 configDotenv();
 
 const app = express();
@@ -10,6 +11,7 @@ const PORT = process.env.PORT || 5000
 app.use(express.json())
 
 app.use('/api/v1/stay',stayRouter)
+app.use('/api/v1/users',userRouter)
 
 app.get('/api/public',(req,res)=>{
   res.send('This is public')
