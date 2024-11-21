@@ -24,3 +24,28 @@ export async function addStay(req,res) { //todo: add auth middleware
     res.status(statusCode).json(error);
   }
 }
+
+export async function updateStay(req, res) {
+  try {
+    const payload = req.body;
+    const { id } = req.params;
+    const response = await StayModel.updateOne({ $id: id }, payload);
+    if(response){
+      res.status(200).json(response);
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+}
+
+export async function deleteStay(req, res) {
+  try {
+    const { id } = req.params;
+    const response = await StayModel.deleteOne({ $id: id });
+    if(response){
+      res.status(200).json(response);
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+}
