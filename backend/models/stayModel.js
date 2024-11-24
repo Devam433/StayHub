@@ -33,7 +33,20 @@ const staySchema = new mongoose.Schema({
         isBooked: {
             type: Boolean,
             default: false
-        }
+        },
+        images: {
+            type: [String], // Array of strings to store image URLs
+            required:true,
+            validate: {
+                validator: function (v) {
+                    // Check that the array has at most 5 elements
+                    return v.length <= 5;
+                },
+                message: props => `You can upload a maximum of 5 images. Currently, you have uploaded ${props.value.length}.`
+            },
+             // Default to an empty array if no images are provided
+        },
+        createdAt: {type:Date,default:Date.now()}
     }
 });
 
