@@ -94,6 +94,8 @@ export async function signIn(req,res,next) {
           _id:user.id,
           name:user.name,
           email:user.email,
+          phoneNumber:user.phoneNumber,
+          role:user.role,
           createdAt:user.createdAt,
           updatedAt:user.updatedAt,
         },

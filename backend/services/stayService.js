@@ -42,6 +42,10 @@ async function createAStay(args) {
 }
 
 export async function addStayService(args) {
+
+  //extract image files from req body and using Multer save it in diskStorage(server)
+
+  //imageUpload() ->uploads image to cloudinary
   validateAddStayData(args)
   return await createAStay(args);
 }

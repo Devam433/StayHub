@@ -3,6 +3,8 @@ import { connectDB } from './db/config.js'
 import { configDotenv } from 'dotenv';
 import stayRouter from './routes/stayRoute.js'
 import userRouter from './routes/usersRoute.js'
+import errorHandlerMiddleware from './middlewares/errorHandlerMiddleware.js'
+
 configDotenv();
 
 const app = express();
@@ -13,6 +15,7 @@ app.use(express.json())
 app.use('/api/v1/stay',stayRouter)
 app.use('/api/v1/users',userRouter)
 
+app.use(errorHandlerMiddleware)
 app.get('/api/public',(req,res)=>{
   res.send('This is public')
 })

@@ -1,10 +1,8 @@
-// middleware/authMiddleware.js
-const jwt = require('jsonwebtoken');
-const dotenv = require('dotenv');
-
+import  dotenv  from "dotenv";
+import jwt from 'jsonwebtoken'
 dotenv.config();
 
-export default verifyToken = (req, res, next) => {
+const verifyToken = (req, res, next) => {
   let token;
 
   if (
@@ -32,3 +30,4 @@ export default verifyToken = (req, res, next) => {
 };
 
 
+export default verifyToken
