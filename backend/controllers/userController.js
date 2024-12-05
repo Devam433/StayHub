@@ -86,7 +86,7 @@ export async function signIn(req,res,next) {
     const passwordMatch = await bcrypt.compare(password,user.password);
     if(passwordMatch) {
       const token = jwt.sign({
-        id: user._id.toString() 
+        id: user._id 
       },process.env.JWT_SECRET,)
       res.status(200).json({
         message:'sign in success',

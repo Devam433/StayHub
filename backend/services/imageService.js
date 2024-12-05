@@ -1,7 +1,9 @@
+import { configDotenv } from 'dotenv';
+import { v2 as cloudinary } from 'cloudinary'
 // services/imageService.js  
-require('dotenv').config();
 
-const cloudinary = require('cloudinary').v2;
+configDotenv();
+// const cloudinary = require('cloudinary').v2;
 
 // Configure Cloudinary
 cloudinary.config({
@@ -14,7 +16,7 @@ cloudinary.config({
 /*
  * Uploads an image to Cloudinary and returns the image URL.
 */
-export default uploadImageToCloudinary = async (imageFilesArray) => {
+export default async function uploadImageToCloudinary(imageFilesArray) {
   if(!imageFilesArray) {return null}
   
   try {

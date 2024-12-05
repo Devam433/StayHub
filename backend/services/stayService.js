@@ -1,8 +1,11 @@
 //this contains decoupled business logic from the route controllers.
 
 import mongoose from "mongoose";
+
 import { StayModel } from "../models/stayModel.js";
 import uploadImageToCloudinary from  "../services/imageService.js"
+import modifyDataStructure from "../utils/modifyDataStructure.js";
+
 function validateAddStayData(args) {
   if (
     args.createdBy == null || 
@@ -30,9 +33,11 @@ function validateAddStayData(args) {
 
 async function createAStay(data) {
   try {
+    console.log('Inside createAStay',data)
     const response = await StayModel.create(data)
     return response;
   } catch (error) {
+    console.log('error in createAStay')
     //NOTE: function validateAddStayData(args) already does the type and null validation but we are adding the below check for other validation checks by he DB.
     if(error.name === "ValidationError") {
       const customErrorObject = {message:'Invalid data!',statusCode:400, mongoDbResponse:error} 
@@ -60,7 +65,24 @@ export async function addStayService(body,files,user) {
   const cloudinary_upoloaded_file_links = await uploadImageToCloudinary(imageFilesArray)
   console.log('cloudinary_upoloaded_file_links',cloudinary_upoloaded_file_links)
 
-  validateAddStayData(body)
-  const data = {...body,createdBy:mongoose.Types.ObjectId(user._id), images:cloudinary_upoloaded_file_links}
-  return await createAStay(data);
+  // validateAddStayData(body)
+
+  const structure = {
+    createdBy: "",
+    stayDetails: {
+      address: {
+        village: "",
+        landmark: "",
+        geolocation: "",
+      },
+      rent: 0,
+      category: "",
+      isBooked: false,
+      images: [],
+    },
+  };
+  console.log('We are here',user)
+  const modifiedData = modifyDataStructure({...body,createdBy:user.id, images:cloudinary_upoloaded_file_links},structure)
+  console.log('We are here 2')
+  return await createAStay(modifiedData);
 }

@@ -18,12 +18,12 @@ const staySchema = new mongoose.Schema({
                 required: true
             },
             geolocation: {
-                type: Number,
+                type: String,
                 required: true
             }
         },
         rent: {
-            type: Number,
+            type: String,
             required: true
         },
         category: {
@@ -31,7 +31,7 @@ const staySchema = new mongoose.Schema({
             required: true
         },
         isBooked: {
-            type: Boolean,
+            type: String,
             default: false
         },
         images: {
