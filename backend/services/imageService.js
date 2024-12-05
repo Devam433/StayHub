@@ -13,30 +13,21 @@ cloudinary.config({
 
 /*
  * Uploads an image to Cloudinary and returns the image URL.
- * @param {string} imagePath - The path of the image file to upload.
- * @returns {Promise<string>} - The URL of the uploaded image.
- * @throws {Error} - Throws an error if the upload fails.
- */
+*/
 export default uploadImageToCloudinary = async (imageFilesArray) => {
   if(!imageFilesArray) {return null}
   
   try {
     //check if array as we might need to upload multiple files
     if(Array.isArray(imageFilesArray) && imageFilesArray.length !==0 ) { 
-
-    /**
-     * We are using Promise.all() so that the uploads happen concurently and ensure that we dont move forward until all async operations(file upload) completes.
-     * Inside we are using map as it returns the value that the promise will be resloved with.
-     */
       const cloudninary_file_urls = await Promise.all( 
-        imageFilesArray.map( async(pathObj) => {
-          const key = Object.keys(pathObj)[0];
-          const path = pathObj[key];
+        imageFilesArray.map( async(path) => {
+          console.log('uploadImageToCloudinary',path)
           const result = await cloudinary.uploader.upload(path,{
-            folder: 'dgin/user', // Optional: Folder to organize images in Cloudinary
+            folder: 'stayhub/user',
             resource_type: 'image',
           })
-          return {[key]:result.secure_url}
+          return result.secure_url
         })
       );
       return cloudninary_file_urls; //If there are no images it will be undefined

@@ -14,8 +14,10 @@ export async function getAllStays(req,res) {
 
 export async function addStay(req,res) { //todo: add auth middleware 
   try {
-    const payload = req.body;
-    const response = await addStayService(payload)
+    const {body,files,user} = req;
+
+    const response = await addStayService(body,files,user)
+
     if(response) {
       res.status(201).json(response);
     }

@@ -2,7 +2,7 @@ import mongoose, { Mongoose } from "mongoose";
 
 const staySchema = new mongoose.Schema({
     createdBy: {
-        type: String, //changes it to string for testing purposes
+        type: mongoose.Types.ObjectId, //changes it to string for testing purposes
         ref: "Users",
         uinque: true,
         required: true
@@ -36,7 +36,6 @@ const staySchema = new mongoose.Schema({
         },
         images: {
             type: [String], // Array of strings to store image URLs
-            required:true,
             validate: {
                 validator: function (v) {
                     // Check that the array has at most 5 elements
