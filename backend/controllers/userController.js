@@ -3,20 +3,20 @@ import { UsersModel } from "../models/userModel.js";
 import jwt from 'jsonwebtoken' 
 
 export async function signUp(req,res,next) {
-  const {name, email, password, phoneNumber,role} = req.body;
+  const {userName, password, phoneNumber,role} = req.body;
   
-  if(!name || !email || !password) {
+  if(!userName || !password) {
     return res.status(400).json({message:'All fields are required'})
   }
-  if(typeof name!="string" || typeof email!="string" || typeof password!="string") {
+  if(typeof userName!="string" || typeof password!="string") {
     return res.status(400).json({message:'Invalid type'})
   }
   
   try {
-    const userFound = await UsersModel.findOne({email:email});
+    const userFound = await UsersModel.findOne({userName:userName});
     //has scope of improvement against timing attack
     if(userFound) {
-      return res.status(409).json({message:'Email not available'}) //conflict
+      return res.status(409).json({message:'Username not available'}) //conflict
     }
   } catch (error) {
     const customError = new Error('Unexpected Error');
@@ -29,8 +29,7 @@ export async function signUp(req,res,next) {
 
   try {
     const user = await UsersModel.create({
-      name,
-      email,
+      userName,
       password:hashedPassword,
       phoneNumber:phoneNumber,
       role:role
@@ -53,7 +52,7 @@ export async function signUp(req,res,next) {
     }
     else if(error.code === 11000) //Mongoose uses error code 11000 for duplicate key errors. 
     {
-      const customError = new Error("Email already exists");
+      const customError = new Error("Username already exists");
       customError.details = error;
       customError.statusCode=409
       next(customError);
@@ -62,21 +61,21 @@ export async function signUp(req,res,next) {
 }
 
 export async function signIn(req,res,next) {
-  const {email,password} = req.body;
-  if(!email || !password) {
+  const {userName,password} = req.body;
+  if(!userName || !password) {
     const error = new Error('All fields are required')
     error.statusCode = 400
     next(error)
     return;
   }
-  if(typeof email !="string" || typeof password!= "string") {
+  if(typeof userName !="string" || typeof password!= "string") {
     const error = new Error('Invalid type')
     error.statusCode = 400;
     return next(error);
   }
 
   try {
-    const user = await UsersModel.findOne({email})
+    const user = await UsersModel.findOne({userName})
     if(!user) {
       const error = new Error('User not found')
       error.statusCode = 404;
@@ -91,9 +90,8 @@ export async function signIn(req,res,next) {
       res.status(200).json({
         message:'sign in success',
         user:{
-          _id:user.id,
-          name:user.name,
-          email:user.email,
+          _id:user._id,
+          userName:user.userName,
           phoneNumber:user.phoneNumber,
           role:user.role,
           createdAt:user.createdAt,

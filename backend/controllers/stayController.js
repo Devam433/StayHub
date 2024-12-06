@@ -1,3 +1,4 @@
+import { setFlagsFromString } from "v8";
 import { StayModel } from "../models/stayModel.js";
 import { addStayService } from "../services/stayService.js";
 import fs from 'fs'
@@ -18,6 +19,7 @@ export async function addStay(req,res) { //todo: add auth middleware
 
     const response = await addStayService(body,files,user)
     console.log('before unlink')
+
     //delete files from diskstorage
     files.forEach((file) => {
       const filePath = file.path;
@@ -41,9 +43,22 @@ export async function addStay(req,res) { //todo: add auth middleware
 
 export async function updateStay(req, res) {
   try {
-    const payload = req.body;
-    const { id } = req.params;
-    const response = await StayModel.updateOne({ $id: id }, payload);
+    const data = req.body;
+    const user = req.user;
+    const id = req.params.replace(":","")
+    
+    //checking if the current user is the user who created the stay
+    const stay = await StayModel.findById(id);
+    if(!stay) {
+      res.status(404).json({message:'Stay not found, please ensure id is valid'})
+    }
+    if(String(user.id) !== String(stay.createdBy)) {
+      res.status(403).json({message:'User is not authorized for this operation'})
+    }
+
+    //TODO: this need to be updated to support the update of images. 
+
+    const response = await StayModel.findByIdAndUpdate(id,{$set:data},{new:true});
     if(response){
       res.status(200).json(response);
     }
@@ -55,7 +70,7 @@ export async function updateStay(req, res) {
 export async function deleteStay(req, res) {
   try {
     const { id } = req.params;
-    const response = await StayModel.deleteOne({ $id: id });
+    const response = await StayModel.findByIdAndDelete(id);
     if(response){
       res.status(200).json(response);
     }
