@@ -6,39 +6,14 @@ import { StayModel } from "../models/stayModel.js";
 import uploadImageToCloudinary from  "../services/imageService.js"
 import modifyDataStructure from "../utils/modifyDataStructure.js";
 
-function validateAddStayData(args) {
-  if (
-    args.createdBy == null || 
-    args.stayDetails.address.village == null || 
-    args.stayDetails.address.landmark == null || 
-    args.stayDetails.address.geolocation == null || 
-    args.stayDetails.rent == null || 
-    args.stayDetails.category == null || 
-    args.stayDetails.isBooked == null
-  ) {
-    throw { message: 'All fields are required!',statusCode: 400 };
-  }
-  if(
-    mongoose.Types.ObjectId.isValid(args.createdBy) ||
-    typeof args.stayDetails.address.village !== "string" ||
-    typeof args.stayDetails.address.landmark !== "string" ||
-    typeof args.stayDetails.address.geolocation !== "number" ||
-    typeof args.stayDetails.rent !== "number" ||
-    typeof args.stayDetails.isBooked !== "boolean" ||
-    typeof args.stayDetails.category !== "string"
-  ) {
-    throw { message: 'Invalid type', statusCode:400 };
-  }
-}
-
 async function createAStay(data) {
   try {
     console.log('Inside createAStay',data)
-    const response = await StayModel.create(data)
+    const stay = new StayModel(data)
+    const response = await stay.save() //Note: Middleware will automatically set `canSelect` to false if the condition is met.
     return response;
   } catch (error) {
     console.log('error in createAStay')
-    //NOTE: function validateAddStayData(args) already does the type and null validation but we are adding the below check for other validation checks by he DB.
     if(error.name === "ValidationError") {
       const customErrorObject = {message:'Invalid data!',statusCode:400, mongoDbResponse:error} 
       throw customErrorObject;
