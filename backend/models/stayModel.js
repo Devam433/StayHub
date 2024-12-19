@@ -66,9 +66,7 @@ const staySchema = new mongoose.Schema({
      }, // Maximum number of users who can select this design. Can be updated by owner up to 3
     selectedByQueue: {
         type:[ //this array of objs are the userIds of the users who are showing interest in renting(This field is only used when the tenentReviewByOwnerRequired is true)
-            {
-                userId: { type: mongoose.Types.ObjectId},
-            },
+            mongoose.Types.ObjectId
         ],
         default:[],
         validate: {
@@ -98,12 +96,26 @@ staySchema.pre("findOneAndUpdate",async function (next){
     console.log('Before this.getQuery')
     const query = this.getQuery(); //gets the query condition (ie.{_id:id})
     console.log('After getQuery',query)
+    console.log('Typeof query',typeof query)
     console.log(update)
-    if(update.$push?.selectedByQueue) { // this is only when 
+    if(update?.['$push']?.selectedByQueue) { // this is only when 
+        console.log('Inside update?.[$push]?...')
+        const stayId = new mongoose.Types.ObjectId(query._id)
+        console.log('typeof stayId',stayId)
         const stay = await this.model.findOne(query);
+        const stayOwner = stay.createdBy;
+        const owner = await UsersModel.findById(stayOwner)
+        console.log(owner)
+        if(owner.tenentReviewByOwnerRequired !== true) {
+            const error = new Error('This feature is only available when Owner of the stay allows!')
+            error.statusCode = 400;
+            return next(error) 
+        }
+        console.log('Found stay',stay)
         if(stay.selectedByQueue.length + 1 >= stay.maxSelections) { //this means that selectedBy length is equal to maxSelections so canSelect should also be false
             update.canSelect = false;
             this.setUpdate(update);
+            console.log('rerer', update)
         }
         else {
             update.canSelect = true;
@@ -123,7 +135,8 @@ staySchema.pre("findOneAndUpdate",async function (next){
             this.setUpdate(update);
         }
     }
-    else {
+    else if(update?.hasOwnProperty('$set') && update?.['$set']?.['stayDetails.isBooked'] !== true){
+        console.log('Im here anyway!! lol')
         const stay = await this.model.findOne(query);
         if(stay.stayDetails.address.isBooked !== false && stay.currentlyBookedBy !== null) { //check if the stay we want to update has isBooked set to false or not
             update.canSelect = true;

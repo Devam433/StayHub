@@ -35,23 +35,21 @@ const usersSchema = new mongoose.Schema({
   },
   isPremium:{  //TODO: This feature will be added later.
     type: Boolean,
-    default:false,
-    validate:{
-      validator: function(){
-        return this.role === 'Tenent'
-      },
-      message:"Only user with Tetent account could have a Premium account."
-    }
+    // validate:{
+    //   validator: function(){
+    //     return this.role === 'Tenant'
+    //   },
+    //   message:"Only user with Tetent account could have a Premium account."
+    // }
   },
   tenentReviewByOwnerRequired: { 
     type:Boolean,
-    default:false,
-    validate:{
-      validator:function() {
-        return this.role === "Owner"
-      },
-      message:"Only users with Owner account can have this field!"
-    }  
+    // validate:{
+    //   validator:function() {
+    //     return this.role === "Owner"
+    //   },
+    //   message:"Only users with Owner account can have this field!"
+    // }  
   }
 }, { timestamps: true });
 
@@ -59,5 +57,27 @@ const usersSchema = new mongoose.Schema({
 usersSchema.methods.isAuthorized = function(allowedRoles) { //method check user role
   return allowedRoles.includes(this.role);
 };
+
+usersSchema.pre('save',function (next) {
+  if(this.role === 'Tenant' && this.isPremium === undefined) {
+    this.isPremium = false
+  }
+
+  if(this.role === 'Owner' && this.tenentReviewByOwnerRequired === undefined) {
+    this.tenentReviewByOwnerRequired = false
+  }
+  console.log('this is this',this)
+  if(this.tenentReviewByOwnerRequired && this.role === 'Tenant') {
+    const error = new Error("Only users with Owner accounts can have this field!");
+    error.statusCode = 400; // Set the status code (e.g., 400 for Bad Request)
+    console.log('returning next(error)')
+    return next(error);
+  }
+
+  if(this.isPremium && this.role === 'Owner') {
+    return next(new Error('Only users with role as Tenant can have this field'))
+  }
+  next()
+})
 
 export const UsersModel = mongoose.model("Users", usersSchema);

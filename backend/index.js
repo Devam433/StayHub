@@ -12,9 +12,10 @@ const PORT = process.env.PORT || 5000
 
 app.use(express.json())
 
-app.use('/api/v1/stay',stayRouter)
-app.use('/api/v1/users',authRouter)
-app.use('/api/v1/book',bookStayRouter)
+app.use('/api/v1/stay',stayRouter) //done -> route for owner to create stay
+app.use('/api/v1/users',authRouter) //done -> auth route
+app.use('/api/v1/book',bookStayRouter) // onprogress -> for tenant perform book operations
+//todo-> /getOwnerDashboard/:id -> total no. of stays, booked by tenant no.
 
 app.use(errorHandlerMiddleware)
 
