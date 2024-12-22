@@ -1,5 +1,6 @@
 
 function errorHandlerMiddleware(err,req,res,next) {
+  console.log('IN error handler',err)
   const statusCode = err.statusCode === 200 ? 500 : err.statusCode;  
   res.status(statusCode); // setting the status code for the response
   switch(statusCode){

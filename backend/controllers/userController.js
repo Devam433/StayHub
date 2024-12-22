@@ -3,37 +3,35 @@ import { UsersModel } from "../models/userModel.js";
 import jwt from 'jsonwebtoken' 
 
 export async function signUp(req,res,next) {
-  const {userName, password, phoneNumber,role} = req.body;
+  const userData = req.body;
+  const {userName,password} = req.body;
+  // if(!userName || !password) {
+  //   return res.status(400).json({message:'All fields are required'})
+  // }
+  // if(typeof userName!=="string" || typeof password!=="string") {
+  //   return res.status(400).json({message:'Invalid type'})
+  // }
   
-  if(!userName || !password) {
-    return res.status(400).json({message:'All fields are required'})
-  }
-  if(typeof userName!="string" || typeof password!="string") {
-    return res.status(400).json({message:'Invalid type'})
-  }
-  
-  try {
+  // try {
     const userFound = await UsersModel.findOne({userName:userName});
     //has scope of improvement against timing attack
     if(userFound) {
       return res.status(409).json({message:'Username not available'}) //conflict
     }
-  } catch (error) {
-    const customError = new Error('Unexpected Error');
-    customError.details = error;
-    next(customError);
-    return;
-  }
+  // } catch (error) {
+  //   const customError = new Error('Unexpected Error');
+  //   customError.details = error;
+  //   next(customError);
+  //   return;
+  // }
 
   const hashedPassword = await bcrypt.hash(password,5);
-
+  console.log('type of hashedPassword', typeof hashedPassword)
+  userData.password = hashedPassword
   try {
-    const user = await UsersModel.create({
-      userName,
-      password:hashedPassword,
-      phoneNumber:phoneNumber,
-      role:role
-    })
+    // const user = await UsersModel.create(userData)
+    const model = new UsersModel(userData)
+    const user = await model.save()
     if(!user) {
       const error = new Error('Internal Error, Try again')
       error.statusCode = 500;
@@ -46,8 +44,8 @@ export async function signUp(req,res,next) {
   } catch (error) {
     if(error.name === "ValidationError") {
       const customError = new Error("Invalid type")
-      error.details = error;
       customError.statusCode=400
+      customError.details = error;
       next(customError);
     }
     else if(error.code === 11000) //Mongoose uses error code 11000 for duplicate key errors. 
@@ -56,6 +54,9 @@ export async function signUp(req,res,next) {
       customError.details = error;
       customError.statusCode=409
       next(customError);
+    }
+    else {
+      next(error);
     }
   }
 }
