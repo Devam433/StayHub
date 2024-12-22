@@ -1,10 +1,51 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import App from './App.jsx'
+import {NextUIProvider} from '@nextui-org/react'
+import Home from './pages/Home.jsx'
+import { RouterProvider, createBrowserRouter } from 'react-router-dom'
+import Login from './pages/Login.jsx'
+import Signup from './pages/Signup.jsx'
+import Profile from './pages/Profile.jsx'
+import Dashboard from './pages/Dashboard.jsx'
+import AddNewStays from './pages/AddNewStays.jsx'
+import ListingDetails from './pages/ListingDetails.jsx'
+
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <Home/>
+  },
+  {
+    path: '/listings/:id',
+    element: <ListingDetails/>
+  },
+  {
+    path: '/login',
+    element: <Login/>
+  },
+  {
+    path: '/signup',
+    element: <Signup/>
+  },
+  {
+    path: '/profile',
+    element: <Profile/>
+  },
+  {
+    path: '/profile/dashboard',
+    element: <Dashboard/>
+  },
+  {
+    path: '/profile/dashboard/addnewstays',
+    element: <AddNewStays/>
+  }
+])
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <NextUIProvider>
+      <RouterProvider router = {router} />
+    </NextUIProvider>
   </StrictMode>,
 )
