@@ -5,6 +5,7 @@ import stayRouter from './routes/stayRoute.js'
 import authRouter from './routes/authRouter.js'
 import errorHandlerMiddleware from './middlewares/errorHandlerMiddleware.js'
 import bookStayRouter from './routes/bookingRouter.js'
+import publicRouter from './routes/publicRoutes.js'
 configDotenv();
 
 const app = express();
@@ -15,7 +16,7 @@ app.use('/api/v1/stay',stayRouter) //done -> route for owner to create stay
 app.use('/api/v1/users',authRouter) //done -> auth route
 app.use('/api/v1/book',bookStayRouter) // onprogress -> for tenant perform book operations
 //todo-> /getOwnerDashboard/:id -> total no. of stays, booked by tenant no.
-
+app.use('/api/v1/public',publicRouter)
 app.use(errorHandlerMiddleware)
 
 app.get('/api/public',(req,res)=>{

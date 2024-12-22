@@ -1,6 +1,6 @@
 import express from 'express'
-import { getAllStays } from '../controllers/publicController.js'
-import { getAvailableStays } from '../controllers/bookingStayController.js'
+import { getAllStays, getAvailableStays } from '../controllers/publicController.js'
+
 
 const router = express.Router()
 
@@ -10,4 +10,4 @@ router.route('/getAllSatys').get(getAllStays)
 router.route('/getAvailableStays').get(getAvailableStays)
 
 
-export default router 
+export default router
