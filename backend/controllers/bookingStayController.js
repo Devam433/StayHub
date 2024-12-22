@@ -74,16 +74,6 @@ export async function unbookStay(req,res) {
   }
 }
 
-//To get all the available stays (using canSelect field to check)
-export async function getAvailableStays(req,res) {
-  try {
-    const availableStays  = await StayModel.find({canSelect:true})
-    return res.status(200).json({succcess:true,availableStays})
-  } catch (error) {
-    const statusCode = error.status || 500;
-    res.status(statusCode).json({success:false,message:'Unexpected error!',error})
-  }
-}
 
 //To show-interest in the stay.Also This is only possible when the owner has reviewTenant set to true and selectedByQueue is not full (ie., 3)
 export async function showInterestInStay(req,res) {

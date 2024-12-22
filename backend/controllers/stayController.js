@@ -2,16 +2,7 @@ import { setFlagsFromString } from "v8";
 import { StayModel } from "../models/stayModel.js";
 import { addStayService } from "../services/stayService.js";
 import fs from 'fs'
-export async function getAllStays(req,res) {
-  try {
-    const response = await StayModel.find();
-    if(response){
-      res.status(200).json(response);
-    }
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-}
+
 
 export async function addStay(req,res) { //todo: add auth middleware 
   try {
