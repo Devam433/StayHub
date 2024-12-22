@@ -6,9 +6,14 @@ import authRouter from './routes/authRouter.js'
 import errorHandlerMiddleware from './middlewares/errorHandlerMiddleware.js'
 import bookStayRouter from './routes/bookingRouter.js'
 import publicRouter from './routes/publicRoutes.js'
+import cors from 'cors'
+
 configDotenv();
 
 const app = express();
+
+app.use(cors())
+
 const PORT = process.env.PORT || 5000
 
 app.use(express.json())
