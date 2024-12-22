@@ -3,6 +3,8 @@ import { UsersModel } from "../models/userModel.js";
 import jwt from 'jsonwebtoken' 
 
 export async function signUp(req,res,next) {
+  console.log(`Hello Kalu`);
+  
   const userData = req.body;
   const {userName,password} = req.body;
   // if(!userName || !password) {

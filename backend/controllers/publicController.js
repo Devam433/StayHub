@@ -1,3 +1,4 @@
+import { StayModel } from '../models/stayModel.js'
 
 export async function getAllStays(req,res) {
   try {
