@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import { ownerDashboardModel } from "./ownerDashboardModel";
-import { tenantDashboardModel } from "./tenantDashboardModel";
+import { ownerDashboardModel } from "./ownerDashboardModel.js";
+import { tenantDashboardModel } from "./tenantDashboardModel.js";
 
 const usersSchema = new mongoose.Schema({
   userName: {
