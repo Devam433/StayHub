@@ -13,6 +13,7 @@ import {
 } from "@nextui-org/react";
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
+import axios from "axios";
 
 export default function Signup() {
   const [isVisible, setIsVisible] = useState(false);
