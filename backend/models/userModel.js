@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import { ownerDashboardModel } from "./ownerDashboardModel";
+import { tenantDashboardModel } from "./tenantDashboardModel";
 
 const usersSchema = new mongoose.Schema({
   userName: {
@@ -80,4 +82,30 @@ usersSchema.pre('save',function (next) {
   next()
 })
 
+usersSchema.post('save',async function(doc,next) { //(doc:the created document,next)
+  try {
+    if(doc.role === 'Owner') {
+      const data = {
+        ownerId: new mongoose.Types.ObjectId(doc._id),
+        allStays:[],
+        currentlyAvailableStays:[],
+        currentlyBookedStays:[],
+        selectedByQueue:[]
+      }
+      await ownerDashboardModel.create(data)
+    }
+    if(doc.role === 'Tenant') {
+      const data = {
+        tenantId: new mongoose.Types.ObjectId(doc._id),
+        currentlyBookedStay:[],
+        selectedByQueue:[],
+        currentlyShowingInterestStay:[]
+      }
+      await tenantDashboardModel.create(data)
+    }
+  } catch (error) {
+    console.log(`Error creating the user's dashboard`,error)
+  }
+  next();
+})
 export const UsersModel = mongoose.model("Users", usersSchema);

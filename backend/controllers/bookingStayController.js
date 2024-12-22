@@ -50,8 +50,8 @@ export async function bookStay(req,res) {
       return res.status(201).json({success:true,message:'Stay Booked',response})
 
   } catch (error) {
-    const statusCode = error.status || 500;
-    res.status(statusCode).json({success:false,message:'Unexpected error!',error})
+    const statusCode = error.statusCode || 500;
+    res.status(statusCode).json({success:false,message:error.message || 'Unexpected error!',error})
   }
 }
 

@@ -1,5 +1,7 @@
 import mongoose, { Mongoose } from "mongoose";
 import { UsersModel } from "./userModel.js";
+import { ownerDashboardModel } from "./ownerDashboardModel.js";
+import { tenantDashboardModel } from "./tenantDashboardModel.js";
 
 const staySchema = new mongoose.Schema({
     createdBy: {
@@ -123,14 +125,29 @@ staySchema.pre("findOneAndUpdate",async function (next){
         }
     }
 
+    //checking if owner has tenentReviewByOwnerRequired true or not. If !true then only allow to book directly. 
+    if(update?.['$set']?.hasOwnProperty('stayDetails.isBooked')) {
+        const stayId = new mongoose.Types.ObjectId(query._id)
+        console.log('typeof stayId',stayId)
+        const stay = await this.model.findOne(query);
+        const stayOwner = stay.createdBy;
+        const owner = await UsersModel.findById(stayOwner)
+        console.log(owner)
+        if(owner.tenentReviewByOwnerRequired) {
+            const error = new Error('This stay requires owner review. Please get into queue instead!')
+            error.statusCode = 403;
+            return next(error);
+        }
+    }
+
     if(update?.['$set']?.['stayDetails.isBooked'] === true) { //if we want to update isBooked as true
         console.log('We inside update?.[$set] ')
         const stay = await this.model.findOne(query);
         console.log('This is stay',stay)
         if(stay.stayDetails.isBooked === false ) { //check if the stay we want to update has isBooked set to true or not
             update.$set.canSelect = false;
-            // update.selectedByQueue = [] //make it work
-        console.log('Update after update.$set.canSelect = false',update)
+            // update.selectedByQueue = [] //make it work 
+            console.log('Update after update.$set.canSelect = false',update)
 
             this.setUpdate(update);
         }
@@ -146,4 +163,33 @@ staySchema.pre("findOneAndUpdate",async function (next){
     next();
 })
 
+staySchema.post('save',async function(doc,next){ //(doc:the created document,next)
+    try {
+        console.log('This is the new created doc',doc)
+        const ownerId = doc.createdBy;
+        const ownerDashboard = await ownerDashboardModel.findOne({ownerId});
+        const updatedOwnerDashboard = await ownerDashboardModel.findOneAndUpdate({ownerId},{$push:{'allStays':doc._id,'currentlyAvailableStays':doc._id}});
+
+    } catch (error) {
+        console.log('Error updating ownerDashboard')
+    }
+})
+
+staySchema.post('findOneAndUpdate', async function(doc,next) {
+    //now also update the ownerDashboard
+    try {
+
+        if(doc.stayDetails.isBooked === true) {
+            const updatedOwnerDashboard = await ownerDashboardModel.findOneAndUpdate({createdBy:doc.createdBy},{$push:{'currentlyBookedStays':doc._id}},{$pull:{'currentlyAvailableStays':doc._id}})
+            const userDshboard = await tenantDashboardModel.findOneAndUpdate({tenantId:doc.currentlyBookedBy},{$set:{'currentlyBookedStay':doc._id}})
+        }
+        if(doc.stayDetails.isBooked !== true) {
+            const updatedOwnerDashboard = await ownerDashboardModel.findOneAndUpdate({createdBy:doc.createdBy},{$pull:{'currentlyBookedStays':doc._id}},{$push:{'currentlyAvailableStays':doc._id}})
+            const userDshboard = await tenantDashboardModel.findOneAndUpdate({tenantId:doc.currentlyBookedBy},{$set:{'currentlyBookedStay':null}})
+        }
+    } catch (error) {
+        console.log('Error updating ownerDashboard in staySchema.pre("findOneAndUpdate"',error);
+    }
+    next();
+})
 export const StayModel = mongoose.model("Stay",staySchema);

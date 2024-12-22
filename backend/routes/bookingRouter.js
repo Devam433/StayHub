@@ -9,5 +9,5 @@ router.post('/un-book-stay/:id',authMiddleware, authorizeMiddleware(['Tenant']),
 
 //The below 2 routes are not for booking but for showing and removing interest. It 
 router.post('/show-interest/:id',authMiddleware, authorizeMiddleware(['Tenant']), showInterestInStay) //this route is for getting into selectedByQueue when the Owner has tenentReviewByOwnerRequired as true /done
-router.post('/remove-interest/:id',authMiddleware, authMiddleware(['Tenant']),removeInterestInStay )
+router.post('/remove-interest/:id',authMiddleware, authorizeMiddleware(['Tenant']),removeInterestInStay )
 export default router;

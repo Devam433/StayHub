@@ -9,11 +9,10 @@ const router = express.Router()
 
 //PUBLIC -> Get all the available stays
 // router.route('/').get(getAllStays)
-
-//PRIVATE to role: Owner
+//PRIVATE to role: Owner -> To add a new stay
 router.route('/').post(authMiddleware,authorizeMiddleware(['Owner']),upload.array('images',5),addStay)
 
-//PRIVATE to role: Owner
+//PRIVATE to role: Owner -> To update an stay details including isBooked
 router.route('/:id').patch(authMiddleware,authorizeMiddleware(['Owner']), updateStay)
  
 //PRIVATE to role: Owner
