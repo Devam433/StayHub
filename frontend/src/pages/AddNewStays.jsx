@@ -21,7 +21,7 @@ export default function AddNewStays() {
   async function createStay() {
     try {
       const formData = new FormData();
-
+      console.log('This is data')
       // Append text fields
       Object.entries(data).forEach(([key, value]) => {
         formData.append(key, value);
@@ -31,7 +31,8 @@ export default function AddNewStays() {
       images.forEach((image, index) => {
         formData.append(`images`, image); // 'images' is the field name for backend
       });
-
+      console.log('this is images',images)
+      console.log('this is form data',formData)
       const response = await axios.post(
         "http://localhost:3000/api/v1/stay",
         formData,

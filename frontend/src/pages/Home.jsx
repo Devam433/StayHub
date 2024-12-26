@@ -12,9 +12,10 @@ function Home() {
   async function fetchStays() {
     try {
       const response = await axios.get('http://localhost:3000/api/v1/public/getAllSatys');
+      console.log(response)
       setData(response.data);
     } catch (error) {
-      
+      console.log(error)
     }
   }
 
