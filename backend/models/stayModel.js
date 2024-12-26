@@ -61,7 +61,8 @@ const staySchema = new mongoose.Schema({
                 if(Owner.tenentReviewByOwnerRequired) { //if tenentReviewByOwnerRequired is true, then the maxSelections is upto 3
                     return v <= 3;
                 }
-                return v.length === 1; // if tenentReviewByOwnerRequired is false then the maxSelections is only 1
+                console.log('This is v',v)
+                return v === 1; // if tenentReviewByOwnerRequired is false then the maxSelections is only 1
             },
             // message: `Can not be selected by more than 3 users!`
         },
@@ -73,6 +74,7 @@ const staySchema = new mongoose.Schema({
         default:[],
         validate: {
             validator: function (v) {
+                console.log('Inside selectedByQueue validator')
                 // Check that the array's total elements is equal to of maxSeection
                 return v.length <= this.maxSelections;
             },
