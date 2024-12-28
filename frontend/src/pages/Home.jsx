@@ -1,13 +1,16 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import NavbarSH from '../components/NavbarSH'
 import SearchBar from '../components/SearchBar'
 import ListingCard from '../components/ListingCard'
 import HomeImage from '../assets/test/home1.avif'
 import axios from 'axios'
+import { dataContext } from '../context/DataContext'
 
 function Home() {
 
-  const [data, setData] = useState();
+  const { data, setData } = useContext(dataContext);
+
+  // const [data, setData] = useState();
 
   async function fetchStays() {
     try {

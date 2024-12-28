@@ -54,7 +54,7 @@ const ListingCard = ({
         <div className="flex justify-between items-center">
           <div className="text-gray-800">
             <span className="font-bold">${price}</span>
-            <span className="text-gray-500 ml-1">night</span>
+            <span className="text-gray-500 ml-1">/month</span>
           </div>
           {availability && (
             <div className="text-xs text-green-600">

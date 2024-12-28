@@ -1,32 +1,32 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import { Heart, Share, MapPin, Star } from 'lucide-react';
+import { dataContext } from '../context/DataContext';
+import { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 
-const ListingDetails = ({ id }) => {
+const ListingDetails = () => {
+
+  const params = useParams();
+
+  const { data } = useContext(dataContext);
+  const [pageData, setPageData] = useState();
+
+  useEffect(() => {
+    setPageData(
+      data?.find((val) => {return val._id == params.id})
+    );    
+  }, [])
+  
   // Mock data for demonstration
   const listing = {
-    id,
-    title: "Luxury Beach Villa",
-    location: "Malibu, California",
-    images: [
-      "/api/placeholder/800/500",
-      "/api/placeholder/800/500",
-      "/api/placeholder/800/500"
-    ],
-    price: 299,
-    rating: 4.9,
+    title: `${pageData?.stayDetails.category}`,
+    location: `${pageData?.stayDetails.address.village}`,
+    landmark: `${pageData?.stayDetails.address.landmark}`,
+    images: pageData?.stayDetails.images,
+    price: `${pageData?.stayDetails.rent}`,
+    rating: 4.5,
     reviews: 128,
-    type: "Entire villa",
-    beds: 4,
-    baths: 3,
-    guests: 8,
-    amenities: [
-      "Beach access",
-      "Pool",
-      "WiFi",
-      "Kitchen",
-      "Free parking",
-      "Air conditioning"
-    ],
+    type: `${pageData?.stayDetails.category}`,
     description: "Stunning beachfront villa with panoramic ocean views. Perfect for family gatherings or special occasions. Direct beach access and private pool.",
     host: {
       name: "Sarah",
@@ -35,6 +35,14 @@ const ListingDetails = ({ id }) => {
       responseTime: "within an hour"
     }
   };
+
+  if(!pageData){
+    return(
+      <>
+      <p>Loading...</p>
+      </>
+    )
+  }
 
   return (
     <div className="max-w-7xl mx-auto p-4">
@@ -91,33 +99,13 @@ const ListingDetails = ({ id }) => {
         <div className="col-span-2">
           <div className="border-b pb-6 mb-6">
             <h2 className="text-xl font-semibold mb-2">
-              {listing.type} hosted by {listing.host.name}
+              {listing.type} hosted at {listing.landmark}
             </h2>
-            <div className="flex space-x-4 text-gray-600">
-              <span>{listing.guests} guests</span>
-              <span>·</span>
-              <span>{listing.beds} bedrooms</span>
-              <span>·</span>
-              <span>{listing.baths} bathrooms</span>
-            </div>
           </div>
 
           <div className="border-b pb-6 mb-6">
             <h3 className="text-lg font-semibold mb-4">About this place</h3>
             <p className="text-gray-600">{listing.description}</p>
-          </div>
-
-          <div className="border-b pb-6 mb-6">
-            <h3 className="text-lg font-semibold mb-4">What this place offers</h3>
-            <div className="grid grid-cols-2 gap-4">
-              {listing.amenities.map((amenity, index) => (
-                <div key={index} className="flex items-center space-x-2">
-                  <span className="px-2 py-1 bg-gray-100 rounded-full text-sm">
-                    {amenity}
-                  </span>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
 
@@ -126,7 +114,7 @@ const ListingDetails = ({ id }) => {
           <div className="sticky top-8 bg-white border rounded-xl p-6 shadow-lg">
             <div className="flex justify-between items-center mb-6">
               <span className="text-2xl font-bold">${listing.price}</span>
-              <span className="text-gray-600">night</span>
+              <span className="text-gray-600">/month</span>
             </div>
             <button className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors">
               Reserve
