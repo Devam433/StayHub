@@ -1,23 +1,46 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Home, PlusCircle, Edit, Trash } from "lucide-react";
 import { Button } from "@nextui-org/react";
 import { NavLink } from "react-router-dom";
 import imageUrl from "../assets/test/home1.avif";
+import axios from "axios"
 
 const Dashboard = () => {
-  const [listings, setListings] = useState([
-    {
-      id: 1,
-      title: "Sunny PG",
-      type: "PG",
-      location: "Downtown",
-      price: "₹5000/month",
-    },
-  ]);
+  const [dashboardData, setDashboardData] = useState();
+  const [allStays,setAllStays] = useState([]);
+  const [currentlyAvailableStays,setCurrentlyAvailableStays] = useState([]);
+  const [currentlyBookedStays,,setcurrentlyBookedStays] = useState([]);
+  console.log(allStays)
+  const [error,setError] = useState(false);
 
   const handleDelete = (id) => {
     setListings(listings.filter((listing) => listing.id !== id));
   };
+
+  useEffect(()=>{
+    const fetchOwnerDashboard = async() => {
+      setError(false);
+      const token = localStorage.getItem('token');
+      // const data = {ownerId:token.id}
+      console.log(token)
+      try {
+        const response = await axios.get('http://localhost:3000/api/v1/dashboard/owner',{
+          headers:{
+            Authorization: 'Bearer ' + token
+          }
+        })
+        console.log(response);
+        setDashboardData(response.data);
+        setAllStays(response.data.allStays);
+        setCurrentlyAvailableStays(response.data.currentlyAvailableStays)
+        setcurrentlyBookedStays(response.data.currentlyBookedStays)
+      } catch (error) {
+        console.log('Unable to fetch owner dashboard data')
+        setError(true);
+      }
+    } 
+    fetchOwnerDashboard();
+  },[])
 
   return (
     <div className="flex">
@@ -52,30 +75,30 @@ const Dashboard = () => {
         <section>
           <h2 className="text-xl font-semibold mb-3">My Stays</h2>
           <div className="space-y-4">
-            {listings.map((listing) => (
+            {allStays?.map((stay) => (
               <div
-                key={listing.id}
+                key={stay}
                 className="border p-4 rounded shadow flex flex-row justify-start items-end"
               >
                 <div className="h-56 mr-4">
                   <img
-                    src={imageUrl || "/api/placeholder/350/240"}
-                    alt={location}
+                    src={stay?.stayDetails?.images[0] || "/api/placeholder/350/240"}
+                    alt={'stayImage'}
                     className="w-full h-full object-cover rounded-lg"
                   />
                 </div>
                 <span>
-                  <h3 className="text-lg font-semibold">{listing.title}</h3>
-                  <p>Type: {listing.type}</p>
-                  <p>Location: {listing.location}</p>
-                  <p>Price: {listing.price}</p>
+                  <h3 className="text-lg font-semibold">{stay?.stayDetails?.category + 'Stay'}</h3>
+                  <p>Type: {stay?.stayDetails?.category || "N/A"}</p>
+                  <p>Location: {stay?.stayDetails?.address.village || "N/A"}</p>
+                  <p>Price: {stay?.stayDetails?.rent || "N/A"}</p>
                   <div className="mt-2">
                     <Button color="secondary" className="mr-2">
                       <Edit className="inline mr-1" /> Edit
                     </Button>
                     <Button
                       color="danger"
-                      onClick={() => handleDelete(listing.id)}
+                      onClick={() => handleDelete()}
                     >
                       <Trash className="inline mr-1" /> Delete
                     </Button>

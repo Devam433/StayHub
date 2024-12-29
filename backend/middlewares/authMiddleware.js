@@ -4,7 +4,8 @@ dotenv.config();
 
 const verifyToken = (req, res, next) => {
   let token;
-
+  console.log('In verifyToken middleware');
+  console.log('header',req.headers)
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith('Bearer')
@@ -12,7 +13,7 @@ const verifyToken = (req, res, next) => {
     // Extract token from header
     token = req.headers.authorization.split(' ')[1];
   }
-
+  console.log('token',token)
   if (!token) {
     return res.status(401).json({ success: false, error: 'Not authorized' });
   }
