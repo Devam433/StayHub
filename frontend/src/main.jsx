@@ -11,6 +11,7 @@ import Dashboard from "./pages/Dashboard.jsx";
 import AddNewStays from "./pages/AddNewStays.jsx";
 import ListingDetails from "./pages/ListingDetails.jsx";
 import DataContext from "./context/DataContext.jsx";
+import EditStay from "./pages/EditStay.jsx";
 
 const router = createBrowserRouter([
   {
@@ -41,6 +42,10 @@ const router = createBrowserRouter([
     path: "/profile/dashboard/addnewstays",
     element: <AddNewStays />,
   },
+  {
+    path: "/profile/dashboard/editstay/:id",
+    element: <EditStay />
+  }
 ]);
 
 createRoot(document.getElementById("root")).render(

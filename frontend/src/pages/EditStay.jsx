@@ -9,19 +9,17 @@ import {
 } from "@nextui-org/react";
 import { useState } from "react";
 import axios from "axios";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 
-export default function AddNewStays() {
+export default function EditStay() {
   const [data, setData] = useState({});
   const [images, setImages] = useState([]); // State to store images
 
   const navigate = useNavigate();
 
-  const handleImageChange = (event) => {
-    setImages([...event.target.files]); // Store the selected files
-  };
+  const param = useParams();
 
-  async function createStay() {
+  async function editStay() {
     try {
       const formData = new FormData();
       console.log('This is data')
@@ -36,8 +34,10 @@ export default function AddNewStays() {
       });
       console.log('this is images',images)
       console.log('this is form data',formData)
-      const response = await axios.post(
-        "http://localhost:3000/api/v1/stay",
+      console.log(param);
+      
+      const response = await axios.patch(
+        `http://localhost:3000/api/v1/stay/:${param.id}`,
         formData,
         {
           headers: {
@@ -58,7 +58,7 @@ export default function AddNewStays() {
     <div className="w-screen h-screen flex justify-center items-center">
       <Card className="w-[400px] p-4">
         <CardHeader className="flex gap-3">
-          <p className="text-2xl font-bold">Add New Stays</p>
+          <p className="text-2xl font-bold">Edit Stay</p>
         </CardHeader>
         <CardBody>
           {/* Input Field - Village Name */}
@@ -126,29 +126,9 @@ export default function AddNewStays() {
             }
           />
           <Divider className="my-2 bg-transparent" />
-          {/* File Upload */}
-          <Input
-            type="file"
-            label="Upload Images"
-            multiple
-            accept="image/*"
-            onChange={handleImageChange}
-            css={{
-              "input::file-selector-button": {
-                mr: "$4",
-                border: "none",
-                background: "$primary",
-                padding: "$2 $4",
-                borderRadius: "$sm",
-                color: "white",
-                cursor: "pointer",
-              },
-            }}
-          />
-          <Divider className="my-2 bg-transparent" />
           {/* Submit Button */}
-          <Button color="primary" onPress={createStay}>
-            Create Stay
+          <Button color="primary" onPress={editStay}>
+            Save
           </Button>
         </CardBody>
         <Divider className="my-2" />

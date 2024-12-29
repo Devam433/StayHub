@@ -35,6 +35,8 @@ export async function addStay(req,res) { //todo: add auth middleware
 //TODO: this need to be updated to support the update of images. 
 export async function updateStay(req, res) {
   try {
+    console.log(`Hello...`);
+    
     const dataToUpdate = req.body;
 
     Object.keys(dataToUpdate).forEach(key=>{
@@ -76,7 +78,11 @@ export async function updateStay(req, res) {
       }
       return acc
     },{})
+    console.log('-> ' + mappedData);
+    
     const response = await StayModel.findByIdAndUpdate(stayId,{$set:mappedData},{new:true});
+    console.log('This is fucking response: ' + response);
+    
     if(response){
       res.status(200).json({message:'Update success',response});
     }
@@ -89,6 +95,8 @@ export async function updateStay(req, res) {
 export async function deleteStay(req, res) {
   try {
     const { id } = req.params;
+    console.log(id + ' - id in delete stay');
+    
     const response = await StayModel.findByIdAndDelete(id);
     if(response){
       res.status(200).json(response);

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Home, PlusCircle, Edit, Trash } from "lucide-react";
 import { Button } from "@nextui-org/react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import imageUrl from "../assets/test/home1.avif";
 import axios from "axios"
 
@@ -12,9 +12,27 @@ const Dashboard = () => {
   const [currentlyBookedStays,,setcurrentlyBookedStays] = useState([]);
   console.log(allStays)
   const [error,setError] = useState(false);
+  const navigate = useNavigate();
 
-  const handleDelete = (id) => {
-    setListings(listings.filter((listing) => listing.id !== id));
+  const handleEdit = (id) => {
+    navigate(`/profile/dashboard/editstay/${id}`);
+  }
+
+  const handleDelete = async (id) => {
+    try {
+      setError(`False`);
+      const token = localStorage.getItem('token');
+      console.log(id);
+      
+      const response = await axios.delete(`http://localhost:3000/api/v1/stay/${id}`,{
+        headers:{
+          Authorization: 'Bearer ' + token
+        }
+      })
+    } catch (error) {
+      console.log(error);      
+      setError(true);
+    }
   };
 
   useEffect(()=>{
@@ -77,7 +95,7 @@ const Dashboard = () => {
           <div className="space-y-4">
             {allStays?.map((stay) => (
               <div
-                key={stay}
+                key={stay._id}
                 className="border p-4 rounded shadow flex flex-row justify-start items-end"
               >
                 <div className="h-56 mr-4">
@@ -93,12 +111,12 @@ const Dashboard = () => {
                   <p>Location: {stay?.stayDetails?.address.village || "N/A"}</p>
                   <p>Price: {stay?.stayDetails?.rent || "N/A"}</p>
                   <div className="mt-2">
-                    <Button color="secondary" className="mr-2">
+                    <Button onClick={() => handleEdit(stay._id)} color="secondary" className="mr-2">
                       <Edit className="inline mr-1" /> Edit
                     </Button>
                     <Button
                       color="danger"
-                      onClick={() => handleDelete()}
+                      onClick={() => handleDelete(stay._id)}
                     >
                       <Trash className="inline mr-1" /> Delete
                     </Button>

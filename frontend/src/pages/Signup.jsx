@@ -11,12 +11,16 @@ import {
   Select,
   SelectItem,
 } from "@nextui-org/react";
-import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { useContext, useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { dataContext } from "../context/DataContext";
 
 export default function Signup() {
   const [isVisible, setIsVisible] = useState(false);
+
+  const navigate = useNavigate();
+  const { currentUserData, setCurrentUserData } = useContext(dataContext);
 
   const toggleVisibility = () => setIsVisible(!isVisible);
 
@@ -28,13 +32,27 @@ export default function Signup() {
     role: 'Owner', // Default role
   });
 
-  async function Signup() {
+  async function SignupAndLogin() {
     try {
       console.log(data);
 
       const response = await axios.post('http://localhost:3000/api/v1/users/signup', data);
       console.log(response);
-      alert('Signup success, please login');
+      // navigate('/');
+      // alert('Signup success, please login');
+      if(response.data){
+        try {
+          console.log(`Fuck Examinar`);
+          
+          const response2 = await axios.post('http://localhost:3000/api/v1/users/signin', data);
+          localStorage.setItem('token', response2.data.token);
+          console.log(response2.data.user);
+          setCurrentUserData(response2.data.user)
+          navigate('/');
+        } catch (error) {
+          console.log('Error while login', error);
+        }
+      }
     } catch (error) {
       console.log('Error while signup', error);
     }
@@ -106,8 +124,8 @@ export default function Signup() {
           </select>
           <Divider className="my-2 bg-transparent" />
           {/* Submit Button */}
-          <Button color="primary" onPress={Signup}>
-            Create Account
+          <Button color="primary" onPress={SignupAndLogin}>
+            Create Account & Login
           </Button>
         </CardBody>
         <Divider className="my-2" />
