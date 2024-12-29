@@ -1,4 +1,3 @@
-import { setFlagsFromString } from "v8";
 import { StayModel } from "../models/stayModel.js";
 import { addStayService } from "../services/stayService.js";
 import fs from 'fs'
@@ -40,7 +39,8 @@ export async function updateStay(req, res) {
     const dataToUpdate = req.body;
 
     Object.keys(dataToUpdate).forEach(key=>{
-      if(dataToUpdate[key] === "" || null || undefined) {
+      console.log('dataToUpdate[key]',dataToUpdate[key].trim())
+      if(dataToUpdate[key].trim() === "" || null || undefined) {
         throw {message:"Cannot update with empty field. Field cannot be empty",statusCode:400}
       }
     })
@@ -60,6 +60,7 @@ export async function updateStay(req, res) {
       res.status(403).json({message:'User is not authorized for this operation'})
       return;
     }
+    console.log('This is the Stay to Update',stay)
     // Define the mapping for flat keys to schema paths
     const fieldMapping = {
       village: "stayDetails.address.village",
@@ -68,7 +69,7 @@ export async function updateStay(req, res) {
       isBooked: "stayDetails.isBooked",
       landmark: "stayDetails.address.landmark",
       geolocation: "stayDetails.address.geolocation",
-      images: "stayDetails.images",
+      // images: "stayDetails.images",
     };
     
     console.log('data to update', dataToUpdate);
@@ -78,10 +79,10 @@ export async function updateStay(req, res) {
       }
       return acc
     },{})
-    console.log('-> ' + mappedData);
+    console.log('This is mapped data ' , mappedData);
     
     const response = await StayModel.findByIdAndUpdate(stayId,{$set:mappedData},{new:true});
-    console.log('This is fucking response: ' + response);
+    console.log('This is fucking updated response ' , response);
     
     if(response){
       res.status(200).json({message:'Update success',response});

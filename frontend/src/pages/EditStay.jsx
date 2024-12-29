@@ -9,7 +9,7 @@ import {
 } from "@nextui-org/react";
 import { useState } from "react";
 import axios from "axios";
-import { Navigate, useNavigate, useParams } from "react-router-dom";
+import {useNavigate, useParams } from "react-router-dom";
 
 export default function EditStay() {
   const [data, setData] = useState({});
@@ -21,24 +21,11 @@ export default function EditStay() {
 
   async function editStay() {
     try {
-      const formData = new FormData();
-      console.log('This is data')
-      // Append text fields
-      Object.entries(data).forEach(([key, value]) => {
-        formData.append(key, value);
-      });
-
-      // Append images
-      images.forEach((image, index) => {
-        formData.append(`images`, image); // 'images' is the field name for backend
-      });
-      console.log('this is images',images)
-      console.log('this is form data',formData)
-      console.log(param);
+      console.log('This is data to update',data)
       
       const response = await axios.patch(
         `http://localhost:3000/api/v1/stay/:${param.id}`,
-        formData,
+        data,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem(`token`)}`
