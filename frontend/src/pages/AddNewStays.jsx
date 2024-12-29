@@ -6,6 +6,8 @@ import {
   Divider,
   Input,
   Button,
+  spinner,
+  Spinner,
 } from "@nextui-org/react";
 import { useState } from "react";
 import axios from "axios";
@@ -14,7 +16,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 export default function AddNewStays() {
   const [data, setData] = useState({});
   const [images, setImages] = useState([]); // State to store images
-
+  const [isSubmitting,setIsSubmitting] = useState(false)
   const navigate = useNavigate();
 
   const handleImageChange = (event) => {
@@ -22,6 +24,7 @@ export default function AddNewStays() {
   };
 
   async function createStay() {
+    setIsSubmitting(true)
     try {
       const formData = new FormData();
       console.log('This is data')
@@ -51,6 +54,8 @@ export default function AddNewStays() {
     } catch (error) {
       console.error(error);
       //Toast...
+    } finally{
+      setIsSubmitting(false)
     }
   }
 
@@ -147,8 +152,8 @@ export default function AddNewStays() {
           />
           <Divider className="my-2 bg-transparent" />
           {/* Submit Button */}
-          <Button color="primary" onPress={createStay}>
-            Create Stay
+          <Button color="primary" onPress={createStay} disabled={isSubmitting}>
+            {isSubmitting ? 'Submitting...' : 'Create Stay'}
           </Button>
         </CardBody>
         <Divider className="my-2" />
