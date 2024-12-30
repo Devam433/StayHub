@@ -9,12 +9,15 @@ import {
   Input,
   Button,
 } from "@nextui-org/react";
-import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { useContext, useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { dataContext } from "../context/DataContext";
 
 export default function Login() {
   const [isVisible, setIsVisible] = useState(false);
+  const { setCurrentUserData } = useContext(dataContext);
+  const navigate = useNavigate();
 
   const toggleVisibility = () => setIsVisible(!isVisible);
 
@@ -22,13 +25,12 @@ export default function Login() {
 
   async function Login() {
     try {
-      console.log(data);
-      
       const response = await axios.post('http://localhost:3000/api/v1/users/signin', data);
-      console.log(response);
       localStorage.setItem('token', response.data.token);
+      setCurrentUserData(response.data.user);
+      navigate('/');
     } catch (error) {
-      
+      console.log('Login error' + error);
     }
   }
 
