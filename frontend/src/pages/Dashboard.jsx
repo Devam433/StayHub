@@ -29,34 +29,38 @@ const Dashboard = () => {
           Authorization: 'Bearer ' + token
         }
       })
+      if(response.data) {
+        fetchOwnerDashboard()
+      }
     } catch (error) {
       console.log(error);      
       setError(true);
     }
   };
 
+  const fetchOwnerDashboard = async() => {
+    setError(false);
+    const token = localStorage.getItem('token');
+    // const data = {ownerId:token.id}
+    console.log(token)
+    try {
+      const response = await axios.get('http://localhost:3000/api/v1/dashboard/owner',{
+        headers:{
+          Authorization: 'Bearer ' + token
+        }
+      })
+      console.log(response);
+      setDashboardData(response.data);
+      setAllStays(response.data.allStays);
+      setCurrentlyAvailableStays(response.data.currentlyAvailableStays)
+      setcurrentlyBookedStays(response.data.currentlyBookedStays)
+    } catch (error) {
+      console.log('Unable to fetch owner dashboard data')
+      setError(true);
+    }
+  } 
+
   useEffect(()=>{
-    const fetchOwnerDashboard = async() => {
-      setError(false);
-      const token = localStorage.getItem('token');
-      // const data = {ownerId:token.id}
-      console.log(token)
-      try {
-        const response = await axios.get('http://localhost:3000/api/v1/dashboard/owner',{
-          headers:{
-            Authorization: 'Bearer ' + token
-          }
-        })
-        console.log(response);
-        setDashboardData(response.data);
-        setAllStays(response.data.allStays);
-        setCurrentlyAvailableStays(response.data.currentlyAvailableStays)
-        setcurrentlyBookedStays(response.data.currentlyBookedStays)
-      } catch (error) {
-        console.log('Unable to fetch owner dashboard data')
-        setError(true);
-      }
-    } 
     fetchOwnerDashboard();
   },[])
 
