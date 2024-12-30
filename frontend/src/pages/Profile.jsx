@@ -7,10 +7,9 @@ import { NavLink } from "react-router-dom";
 import { dataContext } from "../context/DataContext";
 
 function Profile() {
-
   const { currentUserData } = useContext(dataContext);
   console.log(currentUserData);
-  
+
   return (
     <>
       <NavbarSH />
@@ -38,28 +37,38 @@ function Profile() {
 
               {/* Contact Information */}
               <div className="flex items-center justify-center space-x-2 text-gray-600">
-                  <div className="bg-blue-50 rounded-lg p-4 flex-1 max-w-xs">
-                    <p className="text-sm text-gray-500 mb-1">Role</p>
-                    <p className="font-medium">{currentUserData?.role}</p>
-                  </div>
+                <div className="bg-blue-50 rounded-lg p-4 flex-1 max-w-xs">
+                  <p className="text-sm text-gray-500 mb-1">Role</p>
+                  <p className="font-medium">{currentUserData?.role}</p>
                 </div>
+              </div>
 
               <div className="space-y-4">
                 <div className="flex items-center justify-center space-x-2 text-gray-600">
                   <div className="bg-blue-50 rounded-lg p-4 flex-1 max-w-xs">
                     <p className="text-sm text-gray-500 mb-1">Phone</p>
-                    <p className="font-medium">{currentUserData?.phoneNumber}</p>
+                    <p className="font-medium">
+                      {currentUserData?.phoneNumber}
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
             {/* Dashboard link */}
-            <div className="bg-slate-200 px-2 py-5 rounded-xl h-28 flex flex-col justify-around items-center">
-              <Button color="primary" endContent={<UserRoundPen />}>
-                <NavLink to="/profile/dashboard">Access Dashboard</NavLink>
-              </Button>
-              <p className="text-gray-500 text-xs">You are a landlord! Right</p>
-            </div>
+            {currentUserData?.role == "Tenant" ? (
+              <></>
+            ) : (
+              <>
+                <div className="bg-slate-200 px-2 py-5 rounded-xl h-28 flex flex-col justify-around items-center">
+                  <Button color="primary" endContent={<UserRoundPen />}>
+                    <NavLink to="/profile/dashboard">Access Dashboard</NavLink>
+                  </Button>
+                  <p className="text-gray-500 text-xs">
+                    You are a landlord! Right
+                  </p>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>

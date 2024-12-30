@@ -12,6 +12,7 @@ import AddNewStays from "./pages/AddNewStays.jsx";
 import ListingDetails from "./pages/ListingDetails.jsx";
 import DataContext from "./context/DataContext.jsx";
 import EditStay from "./pages/EditStay.jsx";
+import Bookings from "./pages/Bookings.jsx";
 
 const router = createBrowserRouter([
   {
@@ -33,6 +34,10 @@ const router = createBrowserRouter([
   {
     path: "/profile",
     element: <Profile />,
+  },
+  {
+    path: "/bookings",
+    element: <Bookings />
   },
   {
     path: "/profile/dashboard",

@@ -21,7 +21,7 @@ function NavbarSH() {
         </NavbarBrand>
         <NavbarContent className="hidden sm:flex gap-4" justify="center">
           <NavbarItem>
-            <NavLink to="/profile">Bookings</NavLink>
+            <NavLink to="/bookings">Bookings</NavLink>
           </NavbarItem>
           <NavbarItem isActive>
             <NavLink to="/">Home</NavLink>
@@ -31,7 +31,7 @@ function NavbarSH() {
           </NavbarItem>
         </NavbarContent>
 
-        {currentUserData ? (
+        {!currentUserData ? (
           <>
             <NavbarContent justify="end">
               <NavbarItem className="hidden lg:flex">
@@ -39,7 +39,7 @@ function NavbarSH() {
               </NavbarItem>
               <NavbarItem>
                 <NavLink to="/signup">
-                  <Button as={Link} color="primary" href="#" variant="flat">
+                  <Button as={Link} color="primary" variant="flat">
                     Signup
                   </Button>
                 </NavLink>
@@ -49,7 +49,7 @@ function NavbarSH() {
         ) : (
           <>
             <NavbarContent justify="end">
-              <Button as={Link} color="primary" href="#" variant="flat">
+              <Button as={Link} color="primary" variant="flat">
                 Logout
               </Button>
             </NavbarContent>

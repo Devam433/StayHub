@@ -33,7 +33,7 @@ function Home() {
 
     <div className="container mx-auto px-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 py-8">
-        {data?.map((val) => (
+        {data?.filter((val) => val.canSelect == true).map((val) => (
           <ListingCard id={val._id} location={val.stayDetails.address.village} rating={4.5} price={val.stayDetails.rent} type={val.stayDetails.category} availability={val.canSelect} imageUrl={val.stayDetails.images[0]}/>
         ))}
       </div>
