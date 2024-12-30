@@ -67,7 +67,7 @@ const Dashboard = () => {
   return (
     <div className="flex">
       {/* Sidebar */}
-      <aside className="w-[18%] bg-gray-200 h-screen p-5">
+      <aside className="w-[18%] bg-gray-200 min-h-screen p-5">
         <nav>
           <ul className="space-y-4">
             <li>

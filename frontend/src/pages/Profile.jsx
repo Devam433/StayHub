@@ -1,11 +1,16 @@
-import React from "react";
+import React, { useContext } from "react";
 import NavbarSH from "../components/NavbarSH";
 import ProfileImage from "../assets/test/profile.png";
 import { Button } from "@nextui-org/react";
 import { UserRoundPen } from "lucide-react";
 import { NavLink } from "react-router-dom";
+import { dataContext } from "../context/DataContext";
 
 function Profile() {
+
+  const { currentUserData } = useContext(dataContext);
+  console.log(currentUserData);
+  
   return (
     <>
       <NavbarSH />
@@ -26,24 +31,24 @@ function Profile() {
               {/* Name Section */}
               <div className="text-center">
                 <h2 className="text-2xl font-semibold text-gray-800">
-                  John Doe
+                  {currentUserData?.userName}
                 </h2>
                 <div className="h-1 w-20 bg-blue-600 mx-auto mt-2"></div>
               </div>
 
               {/* Contact Information */}
+              <div className="flex items-center justify-center space-x-2 text-gray-600">
+                  <div className="bg-blue-50 rounded-lg p-4 flex-1 max-w-xs">
+                    <p className="text-sm text-gray-500 mb-1">Role</p>
+                    <p className="font-medium">{currentUserData?.role}</p>
+                  </div>
+                </div>
+
               <div className="space-y-4">
                 <div className="flex items-center justify-center space-x-2 text-gray-600">
                   <div className="bg-blue-50 rounded-lg p-4 flex-1 max-w-xs">
                     <p className="text-sm text-gray-500 mb-1">Phone</p>
-                    <p className="font-medium">(555) 123-4567</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-center space-x-2 text-gray-600">
-                  <div className="bg-blue-50 rounded-lg p-4 flex-1 max-w-xs">
-                    <p className="text-sm text-gray-500 mb-1">Email</p>
-                    <p className="font-medium">john.doe@example.com</p>
+                    <p className="font-medium">{currentUserData?.phoneNumber}</p>
                   </div>
                 </div>
               </div>
