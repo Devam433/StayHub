@@ -3,7 +3,7 @@ import { Heart, Share, MapPin, Star } from 'lucide-react';
 import { dataContext } from '../context/DataContext';
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-
+import axios from "axios"
 const ListingDetails = () => {
 
   const params = useParams();
@@ -35,6 +35,31 @@ const ListingDetails = () => {
       responseTime: "within an hour"
     }
   };
+
+  async function handleBookStay() { //done
+    console.log('In handleBookStay')
+    try {
+      const response = await axios.patch(`http://localhost:3000/api/v1/book/book-stay/:${params.id}`,null,{headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          },
+    })
+
+        if(response.data) {
+          console.log('Booking success',response)
+        }
+
+    } catch (error) {
+      console.log('error to book stay',error)
+    }
+  }
+
+  async function handleUnBookStay() { //TODO 
+    try {
+      
+    } catch (error) {
+      
+    }
+  }
 
   if(!pageData){
     return(
@@ -73,7 +98,7 @@ const ListingDetails = () => {
           </div>
         </div>
       </div>
-
+  
       {/* Image Gallery */}
       <div className="grid grid-cols-2 gap-4 mb-8">
         <img 
@@ -116,8 +141,8 @@ const ListingDetails = () => {
               <span className="text-2xl font-bold">${listing.price}</span>
               <span className="text-gray-600">/month</span>
             </div>
-            <button className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors">
-              Reserve
+            <button className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors" onClick={handleBookStay}>
+              Book Stay
             </button>
           </div>
         </div>

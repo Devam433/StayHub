@@ -5,7 +5,7 @@ dotenv.config();
 const verifyToken = (req, res, next) => {
   let token;
   console.log('In verifyToken middleware');
-  console.log('header',req.headers)
+  console.log(req)
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith('Bearer')

@@ -1,6 +1,8 @@
 import {UsersModel}  from "../models/userModel.js";
 
 export default function authorizeMiddleware(role) {
+  console.log('authorizeMiddleware This is the role ->',role)
+  console.log('authorizeMiddleware This is the role ->',role)
   return async (req,res,next) => {
       try {
         if(!req.user) {

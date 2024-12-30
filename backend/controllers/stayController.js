@@ -34,7 +34,7 @@ export async function addStay(req,res) { //todo: add auth middleware
 //TODO: this need to be updated to support the update of images. 
 export async function updateStay(req, res) {
   try {
-    console.log(`Hello...`);
+    console.log(`Inside update stay`);
     
     const dataToUpdate = req.body;
 

@@ -143,9 +143,9 @@ staySchema.pre("findOneAndUpdate",async function (next){
     }
 
     if(update?.['$set']?.['stayDetails.isBooked'] === true) { //if we want to update isBooked as true
-        console.log('We inside update?.[$set] ')
+        console.log('We inside update?.[$set]?.[stayDetails.isBooked] ')
         const stay = await this.model.findOne(query);
-        console.log('This is stay',stay)
+        console.log('This is stay to book in stayMosal.js',stay)
         if(stay.stayDetails.isBooked === false ) { //check if the stay we want to update has isBooked set to true or not
             update.$set.canSelect = false;
             // update.selectedByQueue = [] //make it work 

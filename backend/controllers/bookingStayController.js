@@ -5,6 +5,8 @@ import { StayModel } from "../models/stayModel.js";
 //TODO: Update it so that stay cannot be directly booked if Owner of the stay has reviewTenant set to true
 export async function bookStay(req,res) {
   //id of the stay, id of the user
+  console.log('We are here in bookStay controller')
+
   try {
     console.log('We are here in bookStay controller')
     const {id} = req.params;
@@ -20,7 +22,6 @@ export async function bookStay(req,res) {
     if(!stayToBook) {
      return res.statusCode(404).json({success:false,message:"Stay to book not found. Please ensure id is valid. "})
     }
-    console.log(stayToBook.canSelect)
     //if stayToBook exists then check whether it is available to book on not
     if(!stayToBook.canSelect) {
       return res.status(403).json({success:false,message:'Stay cannot be booked'})
@@ -31,13 +32,8 @@ export async function bookStay(req,res) {
       stayToBook.selectedByQueue.length >= stayToBook.maxSelections ||
       stayToBook.stayDetails.isBooked === true
     ) {
-      console.log("stayToBook.selectedByQueue.length",stayToBook.selectedByQueue.length)
-      console.log("stayToBook.maxSelections",stayToBook.maxSelections)
-      console.log('stayToBook.selectedByQueue.length >= stayToBook.maxSelections',stayToBook.selectedByQueue.length >= stayToBook.maxSelections)
       return res.status(400).json({ success: false, message: "Stay cannot be booked" });
     }
-
-    console.log('after !stayToBook.selectedByQueue.length >= stayToBook.maxSelections')
 
       //TODO: Add payment gateway. Update should only be made when a successful payment has been made.
       const response = await StayModel.findByIdAndUpdate(
@@ -64,7 +60,6 @@ export async function unbookStay(req,res) {
     if(!stayToUnbook) {
       res.status(404).json({success:false,message:'Stay not found. Ensure that id is valid!'})
     }
-
     const response = await StayModel.findByIdAndUpdate(stayId,{$set:{'stayDetails.isBooked':false,currentlyBookedBy:null}})
     console.log('updated unbooked stay',updatedStay)
     return res.status(200).json({success:true,message:'Stay Unbooked',response})
