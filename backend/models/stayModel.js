@@ -1,0 +1,197 @@
+import mongoose, { Mongoose } from "mongoose";
+import { UsersModel } from "./userModel.js";
+import { ownerDashboardModel } from "./ownerDashboardModel.js";
+import { tenantDashboardModel } from "./tenantDashboardModel.js";
+
+const staySchema = new mongoose.Schema({
+    createdBy: {
+        type: mongoose.Types.ObjectId, //changes it to string for testing purposes
+        ref: "Users",
+        required: true
+    },
+    stayDetails: {
+        address: {
+            village: {
+                type: String,
+                required: true
+            },
+            landmark: {
+                type: String,
+                required: true
+            },
+            geolocation: {
+                type: String,
+                required: true
+            }
+        },
+        rent: {
+            type: String,
+            required: true
+        },
+        category: {
+            type: String,
+            required: true
+        },
+        isBooked: {
+            type: Boolean,
+            default: false
+        },
+        images: {
+            type: [String], // Array of strings to store image URLs
+            validate: {
+                validator: function (v) {
+                    // Check that the array has at most 5 elements
+                    return v.length <= 5;
+                },
+                message: props => `You can upload a maximum of 5 images. Currently, you have uploaded ${props.value.length}.`
+            },
+             // Default to an empty array if no images are provided
+        },
+        createdAt: {type:Date,default:Date.now()}
+    },
+    maxSelections: { type: Number, default: 1, //this field is only for Owner with tenentReviewByOwnerRequired as true
+        validate: {
+            validator:async function (v) {
+                const ownerId = this.createdBy; //id of the owner of this document
+                console.log("ownerId",ownerId)
+                const stayModel = this.constructor;
+                console.log("stayModel",stayModel)
+                const Owner = await UsersModel.findById(ownerId)
+                console.log('validator Owner',Owner);
+                if(Owner.tenentReviewByOwnerRequired) { //if tenentReviewByOwnerRequired is true, then the maxSelections is upto 3
+                    return v <= 3;
+                }
+                console.log('This is v',v)
+                return v === 1; // if tenentReviewByOwnerRequired is false then the maxSelections is only 1
+            },
+            // message: `Can not be selected by more than 3 users!`
+        },
+     }, // Maximum number of users who can select this design. Can be updated by owner up to 3
+    selectedByQueue: {
+        type:[ //this array of objs are the userIds of the users who are showing interest in renting(This field is only used when the tenentReviewByOwnerRequired is true)
+            mongoose.Types.ObjectId
+        ],
+        default:[],
+        validate: {
+            validator: function (v) {
+                console.log('Inside selectedByQueue validator')
+                // Check that the array's total elements is equal to of maxSeection
+                return v.length <= this.maxSelections;
+            },
+            message: `Can not be selected by more than maxSelections, you have uploaded. Max selection has been reached!`
+        },
+    },
+    currentlyBookedBy: {
+        type: mongoose.Types.ObjectId,
+        default:null
+    },
+    canSelect:{type: Boolean, default: true}, //This is to check(after the FE send request to bookStay) if user can show interest in booking the stay. If its true that means that the selectedByQueue length has not yet reached to maxSelections and also isBooked is false. So basically is a a single allrounder field that can be checked to know if the stay is available to book ot availabe to insert interested user in the selectedByQueue when maxSelection is not 1.
+
+    bookingDuration:{ //Not working on this as of now. Will 
+        type:String,
+    }
+});
+
+// Middleware to automatically update `canSelect` based on `selectedByQueue` length,maxSelections,isBooked
+staySchema.pre("findOneAndUpdate",async function (next){
+    console.log('In pre("findOneAndUpdate')
+
+    const update = this.getUpdate(); //gets the update object
+    console.log('Before this.getQuery')
+    const query = this.getQuery(); //gets the query condition (ie.{_id:id})
+    console.log('After getQuery',query)
+    console.log('Typeof query',typeof query)
+    console.log(update)
+    if(update?.['$push']?.selectedByQueue) { // this is only when 
+        console.log('Inside update?.[$push]?...')
+        const stayId = new mongoose.Types.ObjectId(query._id)
+        console.log('typeof stayId',stayId)
+        const stay = await this.model.findOne(query);
+        const stayOwner = stay.createdBy;
+        const owner = await UsersModel.findById(stayOwner)
+        console.log(owner)
+        if(owner.tenentReviewByOwnerRequired !== true) {
+            const error = new Error('This feature is only available when Owner of the stay allows!')
+            error.statusCode = 400;
+            return next(error) 
+        }
+        console.log('Found stay',stay)
+        if(stay.selectedByQueue.length + 1 >= stay.maxSelections) { //this means that selectedBy length is equal to maxSelections so canSelect should also be false
+            update.canSelect = false;
+            this.setUpdate(update);
+            console.log('rerer', update)
+        }
+        else {
+            update.canSelect = true;
+            this.setUpdate(update);
+        }
+    }
+
+    //checking if owner has tenentReviewByOwnerRequired true or not. If !true then only allow to book directly. 
+    if(update?.['$set']?.hasOwnProperty('stayDetails.isBooked')) {
+        const stayId = new mongoose.Types.ObjectId(query._id)
+        console.log('typeof stayId',stayId)
+        const stay = await this.model.findOne(query);
+        const stayOwner = stay.createdBy;
+        const owner = await UsersModel.findById(stayOwner)
+        console.log(owner)
+        if(owner.tenentReviewByOwnerRequired) {
+            const error = new Error('This stay requires owner review. Please get into queue instead!')
+            error.statusCode = 403;
+            return next(error);
+        }
+    }
+
+    if(update?.['$set']?.['stayDetails.isBooked'] === true) { //if we want to update isBooked as true
+        console.log('We inside update?.[$set]?.[stayDetails.isBooked] ')
+        const stay = await this.model.findOne(query);
+        console.log('This is stay to book in stayMosal.js',stay)
+        if(stay.stayDetails.isBooked === false ) { //check if the stay we want to update has isBooked set to true or not
+            update.$set.canSelect = false;
+            // update.selectedByQueue = [] //make it work 
+            console.log('Update after update.$set.canSelect = false',update)
+
+            this.setUpdate(update);
+        }
+    }
+    else if(update?.hasOwnProperty('$set') && update?.['$set']?.['stayDetails.isBooked'] !== true){
+        console.log('Im here anyway!! lol')
+        const stay = await this.model.findOne(query);
+        if(stay.stayDetails.address.isBooked !== false && stay.currentlyBookedBy !== null) { //check if the stay we want to update has isBooked set to false or not
+            update.canSelect = true;
+            this.setUpdate(update);
+        }
+    }
+    next();
+})
+
+staySchema.post('save',async function(doc,next){ //(doc:the created document,next)
+    try {
+        console.log('This is the new created doc',doc)
+        const ownerId = doc.createdBy;
+        const ownerDashboard = await ownerDashboardModel.findOne({ownerId});
+        const updatedOwnerDashboard = await ownerDashboardModel.findOneAndUpdate({ownerId},{$push:{'allStays':doc._id,'currentlyAvailableStays':doc._id}});
+
+    } catch (error) {
+        console.log('Error updating ownerDashboard')
+    }
+})
+
+staySchema.post('findOneAndUpdate', async function(doc,next) {
+    //now also update the ownerDashboard
+    try {
+
+        if(doc.stayDetails.isBooked === true) {
+            const updatedOwnerDashboard = await ownerDashboardModel.findOneAndUpdate({createdBy:doc.createdBy},{$push:{'currentlyBookedStays':doc._id}},{$pull:{'currentlyAvailableStays':doc._id}})
+            const userDshboard = await tenantDashboardModel.findOneAndUpdate({tenantId:doc.currentlyBookedBy},{$set:{'currentlyBookedStay':doc._id}})
+        }
+        if(doc.stayDetails.isBooked !== true) {
+            const updatedOwnerDashboard = await ownerDashboardModel.findOneAndUpdate({createdBy:doc.createdBy},{$pull:{'currentlyBookedStays':doc._id}},{$push:{'currentlyAvailableStays':doc._id}})
+            const userDshboard = await tenantDashboardModel.findOneAndUpdate({tenantId:doc.currentlyBookedBy},{$set:{'currentlyBookedStay':null}})
+        }
+    } catch (error) {
+        console.log('Error updating ownerDashboard in staySchema.pre("findOneAndUpdate"',error);
+    }
+    next();
+})
+export const StayModel = mongoose.model("Stay",staySchema);
